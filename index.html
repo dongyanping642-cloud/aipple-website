@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AiPPLE — AIGC广告导演</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#2C2C2C;--bg2:#323232;--bg3:#383838;--line:rgba(255,255,255,0.08);--line2:rgba(255,255,255,0.14);--text:#E8E4DE;--muted:rgba(232,228,222,0.45);--faint:rgba(232,228,222,0.18);}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;font-weight:300;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3.5rem;border-bottom:0.5px solid var(--line);background:rgba(44,44,44,0.92);backdrop-filter:blur(10px);transition:background 0.3s;}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.05rem;letter-spacing:0.06em;color:var(--text);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 3.5rem 5rem;position:relative;overflow:hidden;}
+.hero-rule{position:absolute;top:0;left:0;right:0;height:0.5px;background:var(--line);}
+.hero-name{font-family:'Playfair Display',serif;font-size:clamp(4.5rem,10vw,9rem);font-weight:400;line-height:0.92;letter-spacing:-0.02em;color:var(--text);margin-bottom:2.5rem;}
+.hero-name em{font-style:italic;color:var(--muted);}
+.hero-identity{display:flex;flex-direction:column;gap:0.5rem;max-width:55vw;}
+.hero-identity-line{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:400;color:var(--text);line-height:1.2;}
+.hero-identity-line.dim{font-style:italic;color:rgba(232,228,222,0.6);}
+.hero-btns-overlay{position:absolute;right:3.5rem;bottom:4.5rem;display:flex;flex-direction:column;align-items:flex-end;gap:0.7rem;z-index:10;}
+.btn-outline{display:inline-flex;align-items:center;gap:0.7rem;padding:0.72rem 1.6rem;border:0.5px solid var(--line2);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);background:transparent;cursor:pointer;transition:all 0.25s;white-space:nowrap;}
+.btn-outline:hover{border-color:var(--text);color:var(--text);}
+.scroll-hint{font-size:0.65rem;letter-spacing:0.16em;color:var(--faint);display:flex;align-items:center;gap:0.5rem;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.scroll-arrow{animation:bounce 2s infinite;}
+.rule{height:0.5px;background:var(--line);}
+.section{padding:7rem 3.5rem;min-height:100vh;display:flex;flex-direction:column;justify-content:center;}
+.section-meta{display:flex;align-items:center;gap:1.2rem;font-size:1rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--faint);margin-bottom:3.5rem;}
+.section-meta::before{content:'';width:24px;height:0.5px;background:var(--faint);display:block;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,4.5vw,4rem);font-weight:400;line-height:1.1;color:var(--text);}
+.section-title em{font-style:italic;color:var(--muted);}
+.about{background:var(--bg2);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;margin-top:3rem;}
+.about-body{font-size:1rem;line-height:2;color:rgba(232,228,222,0.9);}
+.about-body p+p{margin-top:1.1rem;}
+.about-highlight{margin-top:2rem;padding:1.4rem 1.6rem;border-left:0.5px solid var(--line2);font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic;color:rgba(232,228,222,0.55);line-height:1.6;}
+.stats-col{display:grid;grid-template-columns:1fr 1fr;gap:0;border-left:0.5px solid var(--line);padding-left:3rem;}
+.stat-row{display:flex;flex-direction:column;justify-content:center;padding:1.6rem 1rem;border-bottom:0.5px solid var(--line);}
+.stat-row:nth-child(odd){border-right:0.5px solid var(--line);}
+.stat-row:nth-child(1),.stat-row:nth-child(2){border-top:0.5px solid var(--line);}
+.stat-num{font-family:'Playfair Display',serif;font-size:1rem;font-weight:400;color:var(--text);line-height:1.3;margin-bottom:0.5rem;}
+.stat-label{font-size:0.62rem;letter-spacing:0.12em;color:var(--faint);text-transform:uppercase;line-height:1.5;}
+.clients{background:var(--bg);min-height:80vh;}
+.clients-grid{display:grid;grid-template-columns:repeat(5,1fr);border:0.5px solid var(--line);margin-top:3rem;}
+.client-cell{padding:1.6rem 1rem;border-right:0.5px solid var(--line);border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center;transition:background 0.2s;}
+.client-cell:hover{background:var(--bg2);}
+.client-cell:nth-child(5n){border-right:none;}
+.client-cell:nth-child(n+11){border-bottom:none;}
+.client-name{font-size:0.9rem;letter-spacing:0.08em;color:var(--muted);}
+.client-cell:hover .client-name{color:var(--text);}
+.client-en{font-size:0.88rem;color:var(--faint);letter-spacing:0.06em;display:block;margin-top:5px;}
+.works-tvc{background:var(--bg2);min-height:100vh;}
+.works-ai{background:var(--bg);min-height:100vh;}
+.works-aiskills{background:var(--bg2);min-height:100vh;}
+.works-divider{display:flex;align-items:center;gap:1.5rem;padding:3rem 3.5rem 0;font-size:0.85rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--faint);}
+.works-divider::before,.works-divider::after{content:'';flex:1;height:0.5px;background:var(--line);}
+.showreel-wrap{position:relative;width:100%;padding-top:56.25%;margin-top:3rem;background:var(--bg3);}
+.showreel-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.showreel-label{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-bottom:1.2rem;border-bottom:0.5px solid var(--line);}
+.showreel-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--text);}
+.showreel-tag{font-size:0.9rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);}
+.filter-bar{display:flex;flex-wrap:wrap;gap:0.45rem;margin:2.5rem 0 1.5rem;}
+.filter-btn{font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.5rem 1.1rem;border:0.5px solid var(--line2);color:var(--muted);background:transparent;cursor:pointer;transition:all 0.18s;}
+.filter-btn:hover{color:var(--text);border-color:var(--text);}
+.filter-btn.active{color:var(--bg);background:var(--text);border-color:var(--text);}
+.vcount{font-size:0.95rem;letter-spacing:0.06em;color:var(--faint);margin-bottom:1.2rem;}
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5px;background:var(--line);}
+.vcard{position:relative;background:var(--bg2);aspect-ratio:16/9;overflow:hidden;cursor:pointer;}
+.vcard:hover .vcard-overlay{opacity:1;}
+.vcard-overlay{position:absolute;inset:0;background:rgba(12,12,12,0.52);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.22s;}
+.vcard-play{width:44px;height:44px;border-radius:50%;border:0.5px solid rgba(232,228,222,0.55);display:flex;align-items:center;justify-content:center;}
+.vcard-play svg{margin-left:2px;}
+.vcard-info{position:absolute;bottom:0;left:0;right:0;padding:0.7rem 0.85rem;background:linear-gradient(to top,rgba(10,10,10,0.95) 0%,transparent 100%);}
+.vcard-brand{font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(232,228,222,0.6);margin-bottom:4px;}
+.vcard-name{font-size:0.85rem;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ai-placeholder-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5px;background:var(--line);margin-top:2rem;}
+.ai-placeholder{aspect-ratio:16/9;background:var(--bg3);display:flex;align-items:center;justify-content:center;}
+.ai-placeholder-text{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);}
+.skills{background:var(--bg);}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 6rem;margin-top:3rem;}
+.skill-item{padding:1.6rem 0;border-bottom:0.5px solid var(--line);position:relative;cursor:default;}
+.skill-item:nth-child(1),.skill-item:nth-child(2){border-top:0.5px solid var(--line);}
+.skill-top{display:flex;justify-content:space-between;margin-bottom:0.6rem;}
+.skill-name{font-size:0.95rem;color:var(--text);}
+.skill-pct{font-size:0.82rem;color:var(--faint);font-family:'Playfair Display',serif;}
+.skill-track{height:0.5px;background:var(--line2);position:relative;}
+.skill-fill{height:0.5px;background:var(--text);position:absolute;top:0;left:0;width:0;transition:width 1.4s cubic-bezier(0.4,0,0.2,1);}
+.skill-tooltip{display:none;position:absolute;bottom:100%;left:0;background:var(--bg3);border:0.5px solid var(--line2);padding:1.8rem 2rem;font-size:1.1rem;line-height:1.9;color:rgba(232,228,222,0.88);width:680px;z-index:10;margin-bottom:12px;white-space:pre-line;}
+.skill-item:hover .skill-tooltip{display:block;}
+.ai-perspective{background:var(--bg);min-height:100vh;}
+.perspective-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5px;background:var(--line);margin-top:3rem;}
+.perspective-card{background:var(--bg);padding:2.5rem 2rem;transition:background 0.2s;}
+.perspective-card:hover{background:var(--bg2);}
+.perspective-num{font-family:'Playfair Display',serif;font-size:1rem;color:var(--faint);letter-spacing:0.15em;margin-bottom:1.5rem;}
+.perspective-heading{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text);margin-bottom:1rem;line-height:1.3;}
+.perspective-text{font-size:0.92rem;line-height:1.9;color:var(--muted);}
+.modal-bg{display:none;position:fixed;inset:0;z-index:500;background:rgba(8,8,8,0.95);align-items:center;justify-content:center;padding:2rem;}
+.modal-bg.open{display:flex;}
+.modal-inner{width:100%;max-width:1100px;}
+.modal-ratio{position:relative;padding-top:56.25%;}
+.modal-ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.modal-bar{display:flex;align-items:flex-start;justify-content:space-between;padding:0.9rem 0 0;gap:1rem;}
+.modal-brand{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--faint);margin-bottom:4px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--text);}
+.modal-close{flex-shrink:0;width:36px;height:36px;border:0.5px solid var(--line2);background:transparent;color:var(--muted);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.modal-close:hover{color:var(--text);border-color:var(--text);}
+.contact{background:var(--bg2);text-align:center;padding:8rem 3.5rem;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.contact-pre{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--faint);margin-bottom:2rem;display:flex;align-items:center;justify-content:center;gap:1rem;}
+.contact-pre::before,.contact-pre::after{content:'';display:block;width:32px;height:0.5px;background:var(--faint);}
+.contact-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5.5vw,5rem);font-weight:400;color:var(--text);margin-bottom:1.5rem;line-height:1.1;}
+.contact-title em{font-style:italic;color:var(--muted);}
+.contact-sub{font-size:0.88rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.9;}
+.contact-email{display:inline-block;font-size:0.82rem;letter-spacing:0.12em;color:var(--muted);text-decoration:none;padding-bottom:3px;border-bottom:0.5px solid var(--line2);transition:all 0.2s;margin-bottom:2.5rem;}
+.contact-email:hover{color:var(--text);border-color:var(--text);}
+.social-row{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;}
+.social-link{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--faint);text-decoration:none;transition:color 0.2s;padding-bottom:2px;border-bottom:0.5px solid transparent;}
+.social-link:hover{color:var(--text);border-color:var(--line2);}
+.contact-follow{font-size:1rem;color:var(--faint);letter-spacing:0.08em;}
+footer{padding:2rem 3.5rem;border-top:0.5px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+.footer-l{font-size:0.7rem;color:var(--faint);}
+.footer-r{font-family:'Playfair Display',serif;font-size:0.75rem;color:var(--faint);font-style:italic;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.au{opacity:0;animation:fadeUp 0.8s ease forwards;}
+.d1{animation-delay:0.05s}.d2{animation-delay:0.18s}.d3{animation-delay:0.32s}.d4{animation-delay:0.5s}
+@media(max-width:900px){.vgrid{grid-template-columns:repeat(2,1fr);}.ai-placeholder-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){nav{padding:1.1rem 1.5rem;}.nav-links{gap:1rem;}.hero,.section,.contact{padding-left:1.5rem;padding-right:1.5rem;}.hero{padding-bottom:3rem;}.about-grid,.skills-grid{grid-template-columns:1fr;gap:2rem;}.clients-grid{grid-template-columns:repeat(3,1fr);}.client-cell:nth-child(5n){border-right:0.5px solid var(--line);}.client-cell:nth-child(3n){border-right:none;}.vgrid{grid-template-columns:1fr;}.works-divider{padding-left:1.5rem;padding-right:1.5rem;}.perspective-grid{grid-template-columns:1fr;}footer{flex-direction:column;gap:0.8rem;text-align:center;}.hero-btns-overlay{right:1.5rem;}}
+
+/* APP GRID */
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem;}
+.app-card{display:flex;flex-direction:column;background:var(--bg3);border:0.5px solid var(--line);}
+.app-img-wrap{width:100%;aspect-ratio:16/9;overflow:hidden;}
+.app-img-placeholder{width:100%;height:100%;background:var(--bg4,#404040);display:flex;align-items:center;justify-content:center;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--faint);}
+.app-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.app-body{padding:1.2rem 1.4rem 1.6rem;}
+.app-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:400;color:var(--text);margin-bottom:0.8rem;line-height:1.3;}
+.app-text{font-size:0.88rem;line-height:1.85;color:var(--muted);}
+
+/* QR CODES */
+.qr-row{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;margin-bottom:3rem;}
+.qr-item{display:flex;flex-direction:column;align-items:center;gap:0.6rem;}
+.qr-placeholder{width:200px;height:200px;background:var(--bg3);border:0.5px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:0.6rem;letter-spacing:0.1em;color:var(--faint);text-align:center;}
+.qr-placeholder img{width:100%;height:100%;object-fit:cover;}
+.qr-label{font-size:1rem;letter-spacing:0.08em;color:var(--muted);margin-top:0.6rem;}
+
+/* PERSPECTIVE 6-grid */
+.perspective-grid{display:grid;gap:0.5px;background:var(--line);margin-top:3rem;}
+
+@media(max-width:900px){
+  .app-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .app-grid{grid-template-columns:1fr;}
+  .qr-row{gap:1.2rem;}
+  .qr-placeholder{width:120px;height:120px;}
+}
+</style>
+</head>
+<body>
+
+<div class="modal-bg" id="modal" onclick="closeModal(event)">
+  <div class="modal-inner">
+    <div class="modal-ratio">
+      <iframe id="modalFrame" src="" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture" frameborder="0" style="width:100%;height:100%;position:absolute;inset:0;border:none;"></iframe>
+    </div>
+    <div class="modal-bar">
+      <div><div class="modal-brand" id="modalBrand"></div><div class="modal-title" id="modalTitle"></div></div>
+      <button class="modal-close" onclick="closeModal(null)">&#10005;</button>
+    </div>
+  </div>
+</div>
+
+<nav id="topNav">
+  <div class="nav-brand">AiPPLE</div>
+  <ul class="nav-links">
+    <li><a href="#about">关于</a></li>
+    <li><a href="#clients">客户</a></li>
+    <li><a href="#tvc">TVC</a></li>
+    <li><a href="#aiworks">AI作品</a></li>
+    <li><a href="#aiskills">AI工作流</a></li>
+    <li><a href="#skills">能力</a></li>
+    <li><a href="#aiperspective">看法</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-rule"></div>
+  <div style="position:absolute;right:0;bottom:0;height:100vh;width:48vw;background:linear-gradient(to left,#3D3D3D 40%,transparent 100%);pointer-events:none;display:flex;align-items:center;justify-content:center;">
+    <div style="text-align:center;opacity:0.2;">
+      <svg width="56" height="56" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="18" r="9" stroke="#E8E4DE" stroke-width="1"/><path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18" stroke="#E8E4DE" stroke-width="1" stroke-linecap="round"/></svg>
+      <div style="font-size:0.6rem;letter-spacing:0.15em;color:#E8E4DE;margin-top:8px;text-transform:uppercase;">个人照片</div>
+    </div>
+  </div>
+  <div class="hero-name au d2">Ai<em>PPLE</em></div>
+  <div class="hero-identity au d3">
+    <div class="hero-identity-line">AIGCer</div>
+    <div class="hero-identity-line dim">TVC广告导演</div>
+    <div class="hero-identity-line">AI Builder</div>
+    <div class="hero-identity-line dim">AI内容创业者</div>
+  </div>
+  
+</section>
+<div class="rule"></div>
+
+<section class="section about" id="about">
+  <div class="section-meta">02 — 关于</div>
+  <div class="section-title" style="margin-bottom:2rem;">
+    <span style="font-size:clamp(2.8rem,5vw,4.2rem);display:block;margin-bottom:0.2rem;">AiPPLE导演</span>
+    <em style="font-size:clamp(1.2rem,2vw,1.6rem);letter-spacing:0.04em;">AIGCer · TVC广告导演 · AI Builder · AI内容创业者</em>
+  </div>
+  <div class="about-grid">
+    <div class="about-body">
+      <p>自研多款AI商业广告工具，擅长美食视觉广告制作，曾创业互动影视剧，有多位明星合作经验。</p>
+      <p>AI时代上海女导演，六把刷子的技术流。多年国际广告经验，专注于食品快消类TVC广告创作，风格兼具商业质感与青春活力，作品呈现少见的视觉张力与时尚感。制作过上百支TVC和数十支AI广告。</p>
+      <p>2023年全力All in AI，是国内最早转型AI创作的导演之一；2025年进一步转型AI Builder，将AI能力系统化落地于商业广告领域和IP内容领域。</p>
+      <p>服务肯德基、麦当劳、必胜客、汉堡王、费列罗、百力滋、蒙牛、德克士、雀巢等头部品牌，以AI重构商业视觉新范式。</p>
+      <p>相信AI不是替代创意，而是释放创意的边界。每一帧都是技术与艺术的精准交叉点。</p>
+      <div class="about-highlight">"用AI重构视觉新江湖，<br>AI赋能创意与商业。"</div>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:1rem;padding-left:3rem;border-left:0.5px solid var(--line);">
+      <div style="font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--faint);margin-bottom:1rem;">直达作品</div>
+      <button class="btn-outline" style="justify-content:space-between;width:100%;font-size:0.85rem;padding:1rem 1.4rem;" onclick="document.getElementById('tvc').scrollIntoView({behavior:'smooth'})">TVC 商业广告 <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg></button>
+      <button class="btn-outline" style="justify-content:space-between;width:100%;font-size:0.85rem;padding:1rem 1.4rem;" onclick="document.getElementById('aiworks').scrollIntoView({behavior:'smooth'})">AI 影像作品 <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg></button>
+      <button class="btn-outline" style="justify-content:space-between;width:100%;font-size:0.85rem;padding:1rem 1.4rem;" onclick="document.getElementById('aiskills').scrollIntoView({behavior:'smooth'})">AI 工具和应用 <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/></svg></button>
+    </div>
+    </div>
+  </div>
+</section>
+<div class="rule"></div>
+
+<section class="section clients" id="clients">
+  <div class="section-meta">03 — 合作客户</div>
+  <div class="section-title">服务过的<br><em>顶级品牌</em></div>
+  <div class="clients-grid">
+    <div class="client-cell"><div class="client-name">肯德基<span class="client-en">KFC</span></div></div>
+    <div class="client-cell"><div class="client-name">麦当劳<span class="client-en">McDonald's</span></div></div>
+    <div class="client-cell"><div class="client-name">必胜客<span class="client-en">Pizza Hut</span></div></div>
+    <div class="client-cell"><div class="client-name">汉堡王<span class="client-en">Burger King</span></div></div>
+    <div class="client-cell"><div class="client-name">德克士<span class="client-en">Dicos</span></div></div>
+    <div class="client-cell"><div class="client-name">赛百味<span class="client-en">Subway</span></div></div>
+    <div class="client-cell"><div class="client-name">蒙牛<span class="client-en">Mengniu</span></div></div>
+    <div class="client-cell"><div class="client-name">百力滋<span class="client-en">Pocky</span></div></div>
+    <div class="client-cell"><div class="client-name">费列罗<span class="client-en">Ferrero</span></div></div>
+    <div class="client-cell"><div class="client-name">丝芙兰<span class="client-en">Sephora</span></div></div>
+    <div class="client-cell"><div class="client-name">飞利浦<span class="client-en">Philips</span></div></div>
+    <div class="client-cell"><div class="client-name">老板电器<span class="client-en">Robam</span></div></div>
+    <div class="client-cell"><div class="client-name">乐之<span class="client-en">RITZ</span></div></div>
+    <div class="client-cell"><div class="client-name">伊利<span class="client-en">Yili</span></div></div>
+    <div class="client-cell"><div class="client-name" style="color:var(--faint);font-size:0.68rem;font-style:italic">持续合作中…</div></div>
+  </div>
+</section>
+<div class="rule"></div>
+
+<section class="section works-tvc" id="tvc">
+  <div class="section-meta">04 — TVC作品</div>
+  <div class="section-title">商业影像<br><em>实拍广告作品</em></div>
+  <div class="showreel-wrap">
+    <iframe src="https://player.xinpianchang.com/?aid=13628426&mid=3Yn57pWdqZlQdDAa" allowfullscreen allow="fullscreen"></iframe>
+  </div>
+  <div class="showreel-label">
+    <div class="showreel-title">AiPPLE导演 2026 美食作品集</div>
+    <div class="showreel-tag">精选作品集 · 全片</div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTVC('all',this)">全部</button>
+    <button class="filter-btn" onclick="filterTVC('kfc',this)">KFC 肯德基</button>
+    <button class="filter-btn" onclick="filterTVC('pizzahut',this)">必胜客</button>
+    <button class="filter-btn" onclick="filterTVC('bk',this)">汉堡王</button>
+    <button class="filter-btn" onclick="filterTVC('mcdonald',this)">麦当劳</button>
+    <button class="filter-btn" onclick="filterTVC('dicos',this)">德克士</button>
+    <button class="filter-btn" onclick="filterTVC('subway',this)">赛百味</button>
+    <button class="filter-btn" onclick="filterTVC('star',this)">明星合作</button>
+    <button class="filter-btn" onclick="filterTVC('other',this)">其他品牌</button>
+  </div>
+  <div class="vcount" id="tvc-count">共 41 支</div>
+  <div class="vgrid" id="vgrid"></div>
+</section>
+<div class="rule"></div>
+
+<div class="works-divider">AI 作品</div>
+<section class="section works-ai" id="aiworks">
+  <div class="section-meta">05 — AI作品</div>
+  <div class="section-title">AIGC影像<br><em>AI生成广告作品</em></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterAI('all',this)">全部</button>
+    <button class="filter-btn" onclick="filterAI('pure-ai',this)">纯AI生成</button>
+    <button class="filter-btn" onclick="filterAI('ai-real',this)">AI+实拍</button>
+  </div>
+  <div class="vcount" id="ai-vcount">共 21 支</div>
+  <div class="vgrid" id="ai-vgrid"></div>
+</section>
+<div class="rule"></div>
+
+<div class="works-divider">AI工作流</div>
+<section class="section works-aiskills" id="aiskills">
+  <div class="section-meta">06 — AI工作流</div>
+  <div class="section-title">工作流研发<br><em>自创Skills · 应用 · 生成器</em></div>
+
+  <div class="app-grid">
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">AI Brainstorming 智能头脑风暴工具</div>
+        <div class="app-text">专为导演创意工作打造的AI辅助工具，用于拓宽思路、激发灵感。在AI场景中联动数字创意人共同碰撞方向，让创意视角始终保持鲜活与先锋。可沿用至医学、互联网、快餐、法政等一切需要思维碰撞的会议场景。</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">智能切片工具</div>
+        <div class="app-text">从TVC成片或长视频中自动提取参考画面的效率工具。精准摘录所需镜头，并设计了「SEAM镜头基因命名法」快速搭建参考素材库，省去大量人工整理的重复劳动。未来个人AI决战场，是你的数据资料库。</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">AI智能分镜工具</div>
+        <div class="app-text">将导演构思快速生成可视化分镜图的辅助工具。在完成构思、参考资料和提示词后，自动转化为清晰分镜图片，大幅提升前期筹备效率，快速验证想法。</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">智能进度表工具</div>
+        <div class="app-text">多项目并行管理的智能排期工具，可按个人工作习惯定制，支持一键合并多个项目时间表，清晰呈现每日工作内容。任一项目调整，总进度表自动同步更新，告别人工漏排。</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">专属提示词生成器</div>
+        <div class="app-text">为商业AI广告专研的提示词工具，深度融入二十余年实拍Know-how与AI模型底层逻辑，结合JSON语言精准构建。以美食广告为切入点，可延伸至汽车、饮品、鞋服等全品类。只需选择预想画面风格，一键生成商用级提示词，大幅减少无效抽卡。</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="app-img-wrap">
+        <div class="app-img-placeholder"><span>应用截图</span></div>
+      </div>
+      <div class="app-body">
+        <div class="app-title">情绪垃圾桶（个人治愈系AI应用）</div>
+        <div class="app-text">专为职场人设计的情绪释放小工具，应对那些想吐槽却不能说的崩溃瞬间。对着手机开口倾诉，系统模拟「把坏情绪丢进垃圾桶」的交互，搭配炸裂音效与正向反馈。每日5次上限，既保证情绪充分释放，又避免陷入负面内耗。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<div class="rule"></div>
+
+<section class="section skills" id="skills">
+  <div class="section-meta">07 — 核心能力</div>
+  <div class="section-title">技术与<br><em>创意融合</em></div>
+  <div class="skills-grid" id="skillGrid">
+
+    <div class="skill-item">
+      <div class="skill-tooltip">早在2023年，我便果断All in AI，成为国内最早一批将AI技术融入影像创作的导演。并非放弃实拍，而是在继续深耕传统影视创作的同时，拥抱全新的技术，让AI成为创意与制作的强力赋能。
+我熟练操作Sora、即梦、Banana、VU3、Suno、Gemini等十余款主流AI工具，覆盖图片、视频和音乐的生成，以及智能创意辅助，熟悉各家模型底层逻辑，形成完整高效的AIGC全链路能力。
+同时我始终没有离开实拍一线，近20年TVC导演经验沉淀至今，真正打通了「纯实拍」「实拍+AI」「全AI生成」三套完整创作体系，既发扬专业影像的叙事质感，又拥有技术带来的效率与想象空间。近几年来，已交付多支商业AI广告，已实现让AI技术融入所有广告的流程中，让每一支广告都兼具技术先锋性与商业传播力。
+我期待，用技术拓宽影像边界，以导演思维赋予AI内容真正的叙事力量。</div>
+      <div class="skill-top"><span class="skill-name">AIGC视频生成 &amp; 导演</span><span class="skill-pct">98</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="98"></div></div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-tooltip">在创意层面，我与团队自主研发了 AI "Brainstorming" 应用，仅作为导演专属的创意辅助工具，可以邀请知名数字创意人在虚拟空间，一起召开头脑风暴会议，共同碰撞思路，不断拓宽创作边界，让导演视角始终保持鲜活与先锋。
+我的导演工作室，长期搭档一群小而精的专业伙伴，大家拥有多年行业经验，创作理念高度同频，且各自具备极强的独立处理问题能力，与我多年并肩作战，早已形成无需多言的默契。
+我们始终相信，专业从不依赖规模，更看重成员的复合能力与多元素养。团队伙伴们愿意主动承担、高效协作，极大降低了内部沟通成本。在过去，精简的团队配置或许不被理解，而AI时代到来后，我们一人多能、高效协同的优势愈发凸显，每个人都能独当一面、成为独立作战的核心单元，这也正是我们一直践行的OPC一人公司理念，也是刻在团队骨子里的团魂。</div>
+      <div class="skill-top"><span class="skill-name">商业广告创意 &amp; 执行</span><span class="skill-pct">95</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="95"></div></div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-tooltip">这是我们团队近大半年来最核心的特色与竞争力。
+2025年9月，我们正式布局AI Coding能力，主动完成一次关键升级——从单纯的AI创作者，转向AI Builder。2026年随着龙虾的火爆，各大主流AI媒体与行业头部观点纷纷提出预测：AI Builder 将成为行业核心趋势，也印证了我们当初的判断与布局。
+近半年来，团队先后自主研发五大类应用，部分已转化为OpenClaw可复用的AI Skill，从GUI转向CLI，研发仍在持续迭代中。我们的初衷很明确：把商业广告创作里一切重复、机械、耗人力却无需人为决策的环节，全部工具化、自动化。不追求大而全、产出平平的臃肿工具，只专注一件事——解放创造力，让创作者真正回到创意与导演本身。</div>
+      <div class="skill-top"><span class="skill-name">AI工具自研开发</span><span class="skill-pct">92</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="92"></div></div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-tooltip">深耕美食广告领域十余年，擅长用镜头精准表现食欲感与有人味的美食质感，形成了极具辨识度的个人视觉风格。多年积累下，拥有近万支全球顶级美食广告资料库，对光影、构图、食材质感与情绪表达拥有犀利的敏锐度和直觉。在AI赋能下，创作视野与趋势感知实现跨越式升级：从传统每月监控300个频道，提升至每月高效追踪3000个全球潮流频道，始终走在行业视觉前沿。
+每一个画面都富有温度，每一个产品都直击味蕾。</div>
+      <div class="skill-top"><span class="skill-name">美食视觉创作</span><span class="skill-pct">96</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="96"></div></div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-tooltip">2016至2020年，我曾拍摄电视剧和电影，投身原创内容创业，打造过具备IP潜力的互动剧项目，遗憾止步于20年初的特殊时代状况。如今，AI时代的到来，重新点燃了我们对原创IP内容的创作激情。但也意识到，新时代的AI内容，必然与传统IP有着完全不同的形态与逻辑。
+目前团队正围绕这一方向深度研发，致力于打造一款真正受大众喜爱、具备强传播力的内容形态。它也将成为我们长期深耕、持续迭代，并逐步构建属于团队自身核心资产的原创内容产品。</div>
+      <div class="skill-top"><span class="skill-name">AI 原创内容</span><span class="skill-pct">93</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="93"></div></div>
+    </div>
+
+    <div class="skill-item">
+      <div class="skill-tooltip">我们所处的广告行业，是人为决策高度密集的领域，审美力、判断力与专业鉴赏力决定了创作的不可替代性，因此工作流始终保持动态迭代。我们坚持以AI工具解放创造力，将重复性工作打磨为高效工具，释放更多时间与精力专注于核心创作。我们紧跟技术趋势，熟悉AI图像工具的应用逻辑，但不盲目卷技术，而是持续拉高创作天花板，不断优化专属创作工作流。</div>
+      <div class="skill-top"><span class="skill-name">AI图像工具 &amp; 工作流</span><span class="skill-pct">90</span></div>
+      <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
+    </div>
+
+  </div>
+</section>
+<div class="rule"></div>
+
+<section class="section ai-perspective" id="aiperspective">
+  <div class="section-meta">08 — 我们的看法</div>
+  <div class="section-title">我们对AI时代，<br><em>广告行业未来的看法</em></div>
+  <div class="perspective-grid" style="grid-template-columns:repeat(3,1fr);">
+
+    <div class="perspective-card">
+      <div class="perspective-num">01</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">人类注意力将成为昂贵资产，内容品质走向极致两极化</div>
+        <div class="perspective-text">AI带来内容产量指数级增长，但人类的专注力与注意力总量恒定稀缺，不会随信息膨胀正比增加。过去产品与内容做到70分即可获得市场正向反馈，未来即便达到90分、甚至95分，才有资格抢夺消费者稀缺的注意力。对广告与内容行业而言，如何捕获这份昂贵注意力，将成为核心命题。同时优质品牌方也不会因AI量产暴增而轻视优质内容成本，甚至视若珍宝——我们觉得会走向两极：平庸内容泛滥贬值，真正能击穿注意力的95分顶级作品，将比现在更稀缺、更昂贵，创作门槛与难度也将大幅提升。</div>
+      </div>
+    </div>
+
+    <div class="perspective-card">
+      <div class="perspective-num">02</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">工具进化，审美永存</div>
+        <div class="perspective-text">从胶片到数码，从手绘到3D，每一代工具的迭代都曾引发"创作者会被取代"的焦虑，但历史一次次证明：工具只是载体，真正稀缺的从来都是审美判断力与叙事能力。AI时代亦然。当所有人都能用AI生成画面，生成本身便不再是壁垒，真正的门槛反而回归到那些更本质的东西——你是否有独特的视角，你是否能讲出打动人心的故事，你是否拥有让画面产生情感共鸣的审美直觉。工具会持续进化，但驾驭工具的人，才是那个决定作品高度的变量。我们相信，AI不会消灭有审美的创作者，只会让审美的价值被放得更大。</div>
+      </div>
+    </div>
+
+    <div class="perspective-card">
+      <div class="perspective-num">03</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">商业价值是AI落地的真正战场</div>
+        <div class="perspective-text">炫技式的AI演示从不稀缺，难的是把AI能力真正转化为商业语言。能服务甲方、能按时交付、能控制预算、能稳定输出符合品牌调性的画面——这些听起来平凡的能力，恰恰是AI内容创作领域最稀缺的壁垒。很多人误以为AI降低了商业创作的门槛，但现实是：它只降低了"生成"的门槛，却大幅提高了"商业落地"的综合要求。你需要既懂品牌策略，又懂AI工具逻辑，还要有足够的实拍经验来判断哪帧画面真正有效。我们做的，就是把这些能力打通，让AI真正服务于商业目标，而不只是停留在演示层面。同时，我们正在率先学习GEO（生成式引擎优化），我个人直接投身到了社交媒体之中，去理解新时代的流量密码，让好的内容被AI看见，被世界看见。</div>
+      </div>
+    </div>
+
+    <div class="perspective-card">
+      <div class="perspective-num">04</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">最好的AI作品，看不出是AI做的</div>
+        <div class="perspective-text">当观众第一眼看到作品，脑子里冒出的第一个问题是"这是AI做的吗"，那这支作品就已经输了一半。技术的存在感本不该盖过内容本身。我们追求的标准一直很明确：AI只是生产工具，最终呈现在画面里的，应该是人的创意、人的温度、人的故事。一个好的AI广告，应该让观众感受到食物的香气、情绪的张力、品牌的气质，而不是在反复追问"这帧是不是AI渲染的"。做到这一点，远比"用AI生成一段酷炫画面"难得多——它需要导演级的叙事判断、对模型输出的精准把控，以及大量反复打磨的工作流积累。这也是我们一直在做的事，让AI退到幕后，让内容走到台前。</div>
+      </div>
+    </div>
+
+    <div class="perspective-card">
+      <div class="perspective-num">05</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">交互范式迁移：从GUI到CLI与Agent时代</div>
+        <div class="perspective-text">APP时代已悄然落幕，GUI（图形用户界面）也将逐步让位于更高效的CLI（命令行界面）与智能Agent生态。这不是技术极客的小圈子游戏，而是一场正在波及所有创作者与从业者的底层范式迁移。未来的工作方式，将不再依赖层层点击与手动操作，而是通过自然语言指令直接驱动智能体完成复杂任务——写脚本、生成分镜、调用工具、输出成片，Agent将成为每一个创作者最强大的协作伙伴。我们团队早已在这条路上践行多时，从OpenClaw到自研AI Skill体系，从GUI工具迁移至CLI驱动的工作流，这正是我们所倡导的OPC一人公司理念的核心逻辑：用最精简的人力配置，借助Agent的力量，完成过去需要十倍人力才能完成的创作任务。</div>
+      </div>
+    </div>
+
+    <div class="perspective-card">
+      <div class="perspective-num">06</div>
+      <div class="perspective-body">
+        <div class="perspective-heading">在混乱期里锚定长期价值</div>
+        <div class="perspective-text">行业正迎来一段混沌期，既是迷雾，也是准备期。用AI彻底解放重复劳动，把创造力还给人。当创作门槛被拉平，唯有拉高创意天花板才是唯一路径——storytelling、商业销售力、审美判断力与驾驭AI Agent的能力，将成为这个时代最不可替代的核心价值。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<div class="rule"></div>
+
+<section class="contact" id="contact">
+  <div class="contact-pre">随时联系</div>
+  <div class="contact-title">聊个<br><em>好项目？</em></div>
+  <div class="contact-sub">
+    接受 TVC广告 · 平面广告 · AIGC创作 · AI工具方案 · IP合作<br>
+    24 小时内回复
+  </div>
+  <div class="qr-row">
+    <div class="qr-item">
+      <div class="qr-placeholder">微信二维码</div>
+      <div class="qr-label">微信</div>
+    </div>
+    <div class="qr-item">
+      <div class="qr-placeholder">视频号</div>
+      <div class="qr-label">视频号</div>
+    </div>
+    <div class="qr-item">
+      <div class="qr-placeholder">小红书</div>
+      <div class="qr-label">小红书</div>
+    </div>
+    <div class="qr-item">
+      <div class="qr-placeholder">抖音</div>
+      <div class="qr-label">抖音</div>
+    </div>
+    <div class="qr-item">
+      <div class="qr-placeholder">快手</div>
+      <div class="qr-label">快手</div>
+    </div>
+  </div>
+  <div class="contact-follow">期待您的关注</div>
+</section>
+
+<footer>
+  <div class="footer-l">&#169; 2026 AiPPLE. 保留所有权利。</div>
+  <div class="footer-r">用AI重构视觉新江湖</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+var tvcVideos = [
+  {aid:'13623060',mid:'enXV4Bq3MA5wBEmM',brand:'KFC 肯德基',name:'熔岩蛋包汁汁和牛堡 董嘉琪',tags:'kfc star'},
+  {aid:'13551637',mid:'bKG8Qd3J82q4RJMy',brand:'必胜客',name:'披萨堡',tags:'pizzahut'},
+  {aid:'12896400',mid:'enXV4BmyogEwBEmM',brand:'汉堡王',name:'法式第戎安格斯 好吃到上天云端篇',tags:'bk'},
+  {aid:'13573567',mid:'xv5YwjoVdql460PX',brand:'Kinder Bueno',name:'一口缤纷 乐更多',tags:'other'},
+  {aid:'13571654',mid:'n8D2wL31XL27JvPB',brand:'必胜客',name:'黄油小熊 IP联名',tags:'pizzahut'},
+  {aid:'13299627',mid:'n2k9QAyADljQ18MZ',brand:'KFC 肯德基',name:'好炸鸡有鳞片',tags:'kfc'},
+  {aid:'13406267',mid:'Mk6B4xNPGvA79LAP',brand:'KFC 肯德基',name:'避风塘大虾塔可 合集',tags:'kfc'},
+  {aid:'13406533',mid:'jlyzw0vpR8oQB198',brand:'百力滋',name:'明星版',tags:'other star'},
+  {aid:'13052734',mid:'GKL87N9bRVXQojJz',brand:'必胜客',name:'比萨堡 金靖',tags:'pizzahut star'},
+  {aid:'13007386',mid:'DaLZwPdPWmDwnrjY',brand:'麦当劳',name:'麦辣脸 导演版',tags:'mcdonald'},
+  {aid:'13428243',mid:'KdRx7b0ZA1R4b2N3',brand:'德克士',name:'火山菠萝堡 抖音竖版',tags:'dicos'},
+  {aid:'13406804',mid:'0lYnQmoW65dw62j1',brand:'赛百味',name:'能量碗',tags:'subway'},
+  {aid:'13088896',mid:'Mk6B4xLPWmL49LAP',brand:'KFC 肯德基',name:'塔可 导演版',tags:'kfc'},
+  {aid:'13097794',mid:'bKG8QdnRymLwRJMy',brand:'KFC 肯德基',name:'老友记全家桶 导演版',tags:'kfc'},
+  {aid:'12569490',mid:'XzVJwDnRK6JQD0EZ',brand:'德克士',name:'不做饭饭之辈 李诚儒',tags:'dicos star'},
+  {aid:'13421651',mid:'DGPB72KKaA0wdrm5',brand:'德克士',name:'火山菠萝堡 TVC',tags:'dicos'},
+  {aid:'13020731',mid:'Mk6B4xPqAEJ49LAP',brand:'必胜客',name:'比萨堡 相信小哥',tags:'pizzahut'},
+  {aid:'11973705',mid:'Rd0Nq7MpOrOQO2Vj',brand:'乐之 RITZ',name:'CG动画芝士人',tags:'other'},
+  {aid:'13195616',mid:'eRPn7qgMRMR4m39p',brand:'KFC 肯德基',name:'劲脆超霸堡 大大大篇',tags:'kfc'},
+  {aid:'13137239',mid:'yM1l43ZOr2Ewod2V',brand:'KFC 肯德基',name:'塔可麻辣神鲜小龙虾',tags:'kfc'},
+  {aid:'12606521',mid:'OpgP7k9DMLD46BL5',brand:'KFC 肯德基',name:'原味鸡陪伴成长20年',tags:'kfc'},
+  {aid:'12636182',mid:'enXV4BmYqgKwBEmM',brand:'KFC 肯德基',name:'葡式蛋挞 女白领厨师',tags:'kfc'},
+  {aid:'13147523',mid:'jlyzw0Z305DQB198',brand:'KFC 肯德基',name:'意式圣诞月 意式厨师K上校',tags:'kfc'},
+  {aid:'13124723',mid:'O5vZQVOl0yA7DEMW',brand:'赛百味',name:'鲍鱼大虾',tags:'subway'},
+  {aid:'13022957',mid:'DaLZwPd5BjgwnrjY',brand:'赛百味',name:'Social 熊人篇',tags:'subway'},
+  {aid:'11169377',mid:'an8D2wLKaeB7JvPB',brand:'沃隆坚果',name:'女排 朱婷',tags:'other star'},
+  {aid:'12612829',mid:'qd9g4r1V61rwv86Z',brand:'KFC 肯德基',name:'香辣鸡腿堡 老铁聚餐',tags:'kfc'},
+  {aid:'12799816',mid:'GKL87N9zW3XQojJz',brand:'KFC 肯德基',name:'新奥尔良烤翅 亲子篇',tags:'kfc'},
+  {aid:'10726068',mid:'5E82CD05ADDE5',brand:'人人车',name:'黄渤篇',tags:'other star'},
+  {aid:'10726055',mid:'5E82CB67A4881',brand:'九阳破壁机',name:'杨幂篇',tags:'other star'},
+  {aid:'12417463',mid:'DA96QenggG17j5N0',brand:'德克士',name:'经典双鸡汉堡',tags:'dicos'},
+  {aid:'10901959',mid:'z3Yn57p6EVL4dDAa',brand:'康师傅',name:'拌面新装上市',tags:'other'},
+  {aid:'12179857',mid:'kE6WlQgeBkRwgdJz',brand:'家乐酱油',name:'酱湖记',tags:'other'},
+  {aid:'10881244',mid:'zqd9g4rq8Awv86ZA',brand:'康师傅',name:'Big桶',tags:'other'},
+  {aid:'12799815',mid:'rVo9wyZ953W4l5PG',brand:'赛百味',name:'热烤猪颈肉芝士三明治',tags:'subway'},
+  {aid:'10726348',mid:'5E82F63D200EF',brand:'永和大王',name:'黑胡椒猪排面 好吃到上天篇',tags:'other'},
+  {aid:'12799813',mid:'yoRe78yWjl1wr1Dj',brand:'赛百味',name:'新鲜篇',tags:'subway'},
+  {aid:'10841453',mid:'5F05677D2C841',brand:'永和大王',name:'神鲜豆浆藤椒鱼 人物版',tags:'other'},
+  {aid:'11587793',mid:'dNK0mw6ajBa7W1na',brand:'金笛润嗓止咳药',name:'古风',tags:'other'},
+  {aid:'11566063',mid:'Rd0Nq7MxgDvQO2Vj',brand:'丝芙兰',name:'籽育能量护肤系列',tags:'other'},
+  {aid:'11813289',mid:'9Mnp8wWGlB8wK0lG',brand:'伊利',name:'须尽欢 古风国风冷饮',tags:'other'},
+  {aid:'10727562',mid:'5E8439474561A',brand:'麦当劳',name:'炫酷组合餐',tags:'mcdonald'},
+  {aid:'12605474',mid:'Xl5M7nV125g7kKEg',brand:'KFC 肯德基',name:'香辣鸡翅 热辣停不下',tags:'kfc'},
+  {aid:'10767080',mid:'5EB52797E1CA0',brand:'亮碟',name:'错过篇',tags:'other'},
+  {aid:'11559056',mid:'GOpgP7kKbpL76BL5',brand:'丝芙兰',name:'柠檬籽元气霜 How To Use',tags:'other'},
+  {aid:'12312531',mid:'rVo9wyZBkyN4l5PG',brand:'汉堡王',name:'犇菠霸牛肋汉堡',tags:'bk'},
+  {aid:'11499521',mid:'xn2k9QAX1nO418MZ',brand:'飞利浦',name:'空气炸锅',tags:'other'},
+  {aid:'13181334',mid:'MzkmwJ9aevv7xjXp',brand:'赛百味',name:'牛上脑三明治 40秒横版',tags:'subway'}
+];
+
+var aiVideos = [
+  {aid:'13484349',mid:'d0Nq7M3Apzk4O2Vj',brand:'蒙牛',name:'AI+实拍 早餐奶微缩牧场 3篇合集',tags:'ai-real other'},
+  {aid:'13551652',mid:'enXV4Bqr9bMwBEmM',brand:'老板电器 x 米其林',name:'全AI广告',tags:'pure-ai other'},
+  {aid:'13090777',mid:'qd9g4rMMYOrwv86Z',brand:'汉堡王',name:'绝绝紫芝心皇堡',tags:'ai-real bk'},
+  {aid:'13406282',mid:'xv5YwjoZPZ1460PX',brand:'必胜客',name:'全AI广告 EVA',tags:'pure-ai pizzahut'},
+  {aid:'13309196',mid:'yoRe78Je6Yo4r1Dj',brand:'必胜客',name:'黄金3脆多汁鸡堡 问AI篇',tags:'ai-real pizzahut'},
+  {aid:'13406263',mid:'Mk6B4xNPGqJ79LAP',brand:'KFC 肯德基',name:'翅桶上新云南烧烤',tags:'ai-real kfc'},
+  {aid:'13299639',mid:'rVo9wyYVMXAwl5PG',brand:'KFC 肯德基',name:'果木烟熏烧烤整鸡架 3篇合集',tags:'ai-real kfc'},
+  {aid:'13299636',mid:'DA96QeeJmj1Qj5N0',brand:'KFC 肯德基',name:'果木烟熏烧烤整鸡架 喊麦篇',tags:'ai-real kfc'},
+  {aid:'13629663',mid:'xv5Ywjo00gk460PX',brand:'KFC 肯德基',name:'月亮堡 嫦娥奔月',tags:'ai-real kfc'},
+  {aid:'13629724',mid:'n2k9QAm6vbWQ18MZ',brand:'日本航空',name:'文旅片 25年9月',tags:'pure-ai other'},
+  {aid:'13629675',mid:'jlyzw0vRWZzQB198',brand:'Jeep',name:'车伪广告 25年8月',tags:'pure-ai other'},
+  {aid:'13629694',mid:'3Yn57pWd2xBQdDAa',brand:'KFC 肯德基',name:'新品纽约幻想 25年9月',tags:'pure-ai kfc'},
+  {aid:'13630148',mid:'oe3Zwv08yxoQJVvz',brand:'宝矿力',name:'释放水和阳光的力量',tags:'pure-ai other'},
+  {aid:'13630162',mid:'jlyzw0vWpYjQB198',brand:'资生堂',name:'化妆水焕肤新生力',tags:'pure-ai other'},
+  {aid:'13630160',mid:'qd9g4rGB1nmQv86Z',brand:'朝日啤酒',name:'居酒屋下班小酌',tags:'pure-ai other'},
+  {aid:'13630165',mid:'8pvbQYg6WYXw306X',brand:'TOYOTA',name:'Family Time',tags:'pure-ai other'},
+  {aid:'13630155',mid:'0VAm7O9LqX24DRnW',brand:'无印良品',name:'放空治愈般触感',tags:'pure-ai other'},
+  {aid:'13629556',mid:'POpZQXg22BG4Er5a',brand:'Nike',name:'AI伪广告',tags:'pure-ai other'},
+  {aid:'13629746',mid:'8pvbQYgM6Xkw306X',brand:'豆豆的生活',name:'VLOG 25年9月',tags:'pure-ai other'},
+  {aid:'13629735',mid:'eRPn7q6GMadwm39p',brand:'KFC 肯德基',name:'骑行异域风味 25年9月',tags:'pure-ai kfc'},
+  {aid:'13629584',mid:'qd9g4rGjjnGQv86Z',brand:'AiPPLE',name:'第一支AI美食视频 24年3月',tags:'pure-ai other'}
+];
+
+var brandColors = {
+  kfc:{bg:'#5C1010',accent:'#C8102E'},
+  pizzahut:{bg:'#5C0C0C',accent:'#E31837'},
+  bk:{bg:'#5C3400',accent:'#D4820A'},
+  mcdonald:{bg:'#5C4A00',accent:'#FFC72C'},
+  dicos:{bg:'#5C1400',accent:'#E04B00'},
+  subway:{bg:'#0D4000',accent:'#009A44'},
+  star:{bg:'#1E1538',accent:'#7B68C8'},
+  other:{bg:'#303030',accent:'#888880'}
+};
+
+function getColor(tags){
+  var order=['kfc','pizzahut','bk','mcdonald','dicos','subway','star'];
+  for(var i=0;i<order.length;i++){if(tags.indexOf(order[i])!==-1)return brandColors[order[i]];}
+  return brandColors.other;
+}
+
+function buildCard(v){
+  var c=getColor(v.tags);
+  var fw=v.brand.split(' ')[0];
+  var thumbUrl='https://p.xinpianchang.com/article/'+v.aid+'/cover.jpg';
+  var bgBlock='<div style="position:absolute;inset:0;background:'+c.bg+';">'+
+    '<div style="position:absolute;inset:0;background:linear-gradient(135deg,'+c.bg+' 30%,'+c.accent+'33 100%);"></div>'+
+    '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);font-family:Georgia,serif;font-size:2.8rem;color:#fff;opacity:0.09;white-space:nowrap;">'+fw+'</div>'+
+    '<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:'+c.accent+';opacity:0.55;"></div>'+
+    '</div>';
+  var imgBlock='<img src="'+thumbUrl+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" '+
+    'onerror="this.style.display=\'none\'" />';
+  return '<div class="vcard" data-tags="'+v.tags+'" onclick="openModal(\''+v.aid+'\',\''+v.mid+'\',\''+v.brand+'\',\''+v.name+'\')">'+
+    bgBlock+imgBlock+
+    '<div class="vcard-overlay"><div class="vcard-play"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2.5l10 5.5-10 5.5V2.5z" fill="rgba(232,228,222,0.9)"/></svg></div></div>'+
+    '<div class="vcard-info"><div class="vcard-brand">'+v.brand+'</div><div class="vcard-name">'+v.name+'</div></div>'+
+    '</div>';
+}
+
+var tvcGrid = document.getElementById('vgrid');
+if(tvcGrid){
+  var h='';
+  for(var i=0;i<tvcVideos.length;i++){h+=buildCard(tvcVideos[i]);}
+  tvcGrid.innerHTML=h;
+  tvcGrid.style.cssText+='opacity:1;transform:none;';
+}
+
+var aiGrid = document.getElementById('ai-vgrid');
+if(aiGrid){
+  var h='';
+  for(var i=0;i<aiVideos.length;i++){h+=buildCard(aiVideos[i]);}
+  aiGrid.innerHTML=h;
+  aiGrid.style.cssText+='opacity:1;transform:none;';
+}
+
+function filter(tag,btn){
+  var tvcSection=document.getElementById('tvc');
+  var btns=tvcSection.querySelectorAll('.filter-btn');
+  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
+  btn.classList.add('active');
+  var cards=tvcGrid.querySelectorAll('.vcard');
+  var count=0;
+  for(var i=0;i<cards.length;i++){
+    var show=tag==='all'||cards[i].dataset.tags.indexOf(tag)!==-1;
+    cards[i].style.display=show?'':'none';
+    if(show)count++;
+  }
+  document.getElementById('vcount').textContent='共 '+count+' 支';
+}
+
+function filterAI(tag,btn){
+  var btns=document.getElementById('aiworks').querySelectorAll('.filter-btn');
+  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
+  btn.classList.add('active');
+  var cards=aiGrid.querySelectorAll('.vcard');
+  var count=0;
+  for(var i=0;i<cards.length;i++){
+    var show=tag==='all'||cards[i].dataset.tags.indexOf(tag)!==-1;
+    cards[i].style.display=show?'':'none';
+    if(show)count++;
+  }
+  document.getElementById('ai-vcount').textContent='共 '+count+' 支';
+}
+
+function openModal(aid,mid,brand,name){
+  document.getElementById('modalFrame').src='https://player.xinpianchang.com/?aid='+aid+'&mid='+mid;
+  document.getElementById('modalBrand').textContent=brand;
+  document.getElementById('modalTitle').textContent=name;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modal'))return;
+  document.getElementById('modalFrame').src='';
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal(null);});
+
+window.addEventListener('scroll',function(){
+  document.getElementById('topNav').style.background=
+    window.scrollY>60?'rgba(44,44,44,0.97)':'rgba(44,44,44,0.92)';
+});
+
+var sg=document.getElementById('skillGrid');
+if(sg){
+  new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting){
+      var bars=sg.querySelectorAll('.skill-fill');
+      for(var i=0;i<bars.length;i++)bars[i].style.width=bars[i].dataset.w+'%';
+    }
+  },{threshold:0.2}).observe(sg);
+}
+
+var fObs=new IntersectionObserver(function(entries){
+  for(var i=0;i<entries.length;i++){
+    if(entries[i].isIntersecting){
+      entries[i].target.style.opacity='1';
+      entries[i].target.style.transform='translateY(0)';
+    }
+  }
+},{threshold:0.05});
+
+var fadeEls=document.querySelectorAll('.section-meta,.section-title,.about-grid,.clients-grid,.showreel-wrap,.filter-bar,.skills-grid,.perspective-grid,.contact-title,.contact-sub');
+for(var i=0;i<fadeEls.length;i++){
+  fadeEls[i].style.cssText='opacity:0;transform:translateY(18px);transition:opacity 0.65s ease,transform 0.65s ease';
+  fObs.observe(fadeEls[i]);
+}
+
+var links=document.querySelectorAll('a[href^="#"]');
+for(var i=0;i<links.length;i++){
+  links[i].addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+}
+</script>
+</body>
+</html>
