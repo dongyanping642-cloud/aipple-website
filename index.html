@@ -591,6 +591,78 @@ var aiVideos = [
   {aid:'13629584',mid:'qd9g4rGjjnGQv86Z',brand:'AiPPLE',name:'第一支AI美食视频 24年3月',tags:'pure-ai other'}
 ];
 
+var localThumbs = {
+  '13623060': 'KFC 肯德基 — 熔岩蛋包汁汁和牛堡 董嘉琪.jpg',
+  '13551637': '必胜客 — 披萨堡.jpg',
+  '12896400': '汉堡王 — 法式第戎安格斯 好吃到上天云端篇.jpg',
+  '13573567': 'Kinder Bueno · 微智传媒 — 一口缤纷·乐更多.jpg',
+  '13571654': '必胜客 — × 黄油小熊 IP联名.jpg',
+  '13299627': 'KFC 肯德基 — 好炸鸡有鳞片.jpg',
+  '13406267': 'KFC 肯德基 — 避风塘大虾塔可 合集.jpg',
+  '13406533': '百力滋 — 明星版.jpg',
+  '13052734': '必胜客 — 比萨堡 金靖.jpg',
+  '13007386': '麦当劳 — 麦辣脸 导演版.jpg',
+  '13428243': '德克士 — 火山菠萝堡 Social 抖音竖版.jpg',
+  '13406804': '赛百味 — 能量碗.jpg',
+  '13088896': 'KFC 肯德基 — 塔可 导演版.jpg',
+  '13097794': 'KFC 肯德基 — 老友记全家桶 导演版.jpg',
+  '12569490': '德克士 — 不做饭饭之辈 李诚儒.jpg',
+  '13421651': '德克士 — 火山菠萝堡 TVC.jpg',
+  '13020731': '必胜客 — 比萨堡 相信小哥.jpg',
+  '11973705': '乐之饼干   动画芝士人.jpg',
+  '13195616': 'KFC 劲脆超霸堡 大大大篇.jpg',
+  '13137239': 'KFC 肯德基 — 塔可麻辣神鲜小龙虾.jpg',
+  '12606521': 'KFC 肯德基 — 原味鸡陪伴成长20年.jpg',
+  '12636182': 'KFC 肯德基 — 葡式蛋挞 女白领厨师.jpg',
+  '13147523': 'KFC 肯德基 — 意式圣诞月 意式厨师K上校.jpg',
+  '13124723': '赛百味 — 鲍鱼大虾.jpg',
+  '13022957': '赛百味 — Social 熊人篇.jpg',
+  '11169377': '沃隆坚果 — 女排 朱婷.jpg',
+  '12612829': 'KFC 肯德基 — 香辣鸡腿堡 老铁聚餐.jpg',
+  '12799816': 'KFC 肯德基 — 新奥尔良烤翅 亲子篇.jpg',
+  '10726068': '人人车 — 黄渤篇.jpg',
+  '10726055': '九阳破壁机 — 杨幂篇.jpg',
+  '12417463': '德克士 — 经典双鸡汉堡.jpg',
+  '10901959': '康师傅 — 拌面新装上市.jpg',
+  '12179857': '家乐酱油 — 酱湖记.jpg',
+  '10881244': '康师傅 — Big桶.jpg',
+  '12799815': '赛百味 — 热烤猪颈肉芝士三明治 FD.jpg',
+  '10726348': '永和大王 — 黑胡椒猪排面 好吃到上天篇.jpg',
+  '12799813': '赛百味 — 新鲜篇.jpg',
+  '10841453': '永和大王 — 神鲜豆浆藤椒鱼 人物版.jpg',
+  '11587793': '金笛润嗓止咳药 — 古风.jpg',
+  '11566063': '丝芙兰 — 籽育能量护肤系列.jpg',
+  '11813289': '伊利 — 须尽欢 古风国风冷饮.jpg',
+  '10727562': '麦当劳 — 炫酷组合餐.jpg',
+  '12605474': 'KFC 肯德基 — 香辣鸡翅 热辣停不下.jpg',
+  '10767080': '亮碟 — 错过篇.jpg',
+  '11559056': '丝芙兰 — 柠檬籽元气霜 How To Use.jpg',
+  '12312531': '汉堡王 — 犇菠霸牛肋汉堡.jpg',
+  '11499521': '飞利浦 — 空气炸锅.jpg',
+  '13181334': '赛百味 — 牛上脑三明治 40秒横版.jpg',
+  '13484349': '蒙牛 — AI+实拍广告 早餐奶微缩奶牛牧场 3篇合集.jpg',
+  '13551652': '老板电器   米其林  全AI广告.jpg',
+  '13090777': '汉堡王 — 绝绝紫芝心皇堡.jpg',
+  '13406282': '必胜客 — 全AI广告 × EVA.jpg',
+  '13309196': '必胜客 — 黄金3脆多汁鸡堡 问AI篇.jpg',
+  '13406263': 'KFC 肯德基 — 翅桶上新云南烧烤.jpg',
+  '13299639': 'KFC 肯德基  果木烟熏烧烤整鸡架 3篇合集.jpg',
+  '13299636': 'KFC 肯德基 — 果木烟熏烧烤整鸡架 喊麦篇 长版.jpg',
+  '13629663': 'KFC月亮堡 嫦娥奔月.png',
+  '13629724': '日本航空文旅片25年9月.png',
+  '13629675': 'Jeep车伪广告25年8月.png',
+  '13629694': '肯德基新品纽约幻想25年9月.png',
+  '13630148': '宝矿力释放水和阳光的力量.png',
+  '13630162': '资生堂化妆水焕肤新生力.png',
+  '13630160': '朝日啤酒居酒屋下班小酌.png',
+  '13630165': 'TOYOTA family time.png',
+  '13630155': '无印良品放空治愈般触感.png',
+  '13629556': 'Nike AI 伪广告.png',
+  '13629746': '豆豆的生活VLOG25年9月.png',
+  '13629735': '肯德基骑行异域风味25年9月.png',
+  '13629584': '第一支AI美食视频24年3月.png'
+};
+
 var brandColors = {
   kfc:{bg:'#5C1010',accent:'#C8102E'},
   pizzahut:{bg:'#5C0C0C',accent:'#E31837'},
@@ -611,7 +683,8 @@ function getColor(tags){
 function buildCard(v){
   var c=getColor(v.tags);
   var fw=v.brand.split(' ')[0];
-  var thumbUrl='https://p.xinpianchang.com/article/'+v.aid+'/cover.jpg';
+  var localFile = localThumbs[v.aid] ? encodeURIComponent(localThumbs[v.aid]).replace(/%20/g,'%20') : null;
+  var thumbUrl = localFile ? localFile : 'https://p.xinpianchang.com/article/'+v.aid+'/cover.jpg';
   var bgBlock='<div style="position:absolute;inset:0;background:'+c.bg+';">'+
     '<div style="position:absolute;inset:0;background:linear-gradient(135deg,'+c.bg+' 30%,'+c.accent+'33 100%);"></div>'+
     '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);font-family:Georgia,serif;font-size:2.8rem;color:#fff;opacity:0.09;white-space:nowrap;">'+fw+'</div>'+
